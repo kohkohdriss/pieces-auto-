@@ -1,5 +1,9 @@
-import { ajoutListenersAvis, ajoutListenerEnvoyerAvis } from "./avis.js";
-
+import {
+  ajoutListenersAvis,
+  ajoutListenerEnvoyerAvis,
+  afficherAvis,
+  afficherGraphiqueAvis,
+} from "./avis.js";
 //Récupération des pièces eventuellement stockées dans le localStorage
 let pieces = window.localStorage.getItem("pieces");
 
@@ -14,7 +18,6 @@ if (pieces === null) {
 } else {
   pieces = JSON.parse(pieces);
 }
-
 // on appel la fonction pour ajouter le listener au formulaire
 ajoutListenerEnvoyerAvis();
 
@@ -25,6 +28,7 @@ function genererPieces(pieces) {
     const sectionFiches = document.querySelector(".fiches");
     // Création d’une balise dédiée à une pièce automobile
     const pieceElement = document.createElement("article");
+    pieceElement.dataset.id = pieces[i].id;
     // Création des balises
     const imageElement = document.createElement("img");
     imageElement.src = article.image;
@@ -63,6 +67,17 @@ function genererPieces(pieces) {
 }
 
 genererPieces(pieces);
+
+for (let i = 0; i < pieces.length; i++) {
+  const id = pieces[i].id;
+  const avisJSON = window.localStorage.getItem(`avis-piece-${id}`);
+  const avis = JSON.parse(avisJSON);
+
+  if (avis !== null) {
+    const pieceElement = document.querySelector(`article[data-id="${id}"]`);
+    afficherAvis(pieceElement, avis);
+  }
+}
 
 //gestion des bouttons
 const boutonTrier = document.querySelector(".btn-trier");
@@ -133,7 +148,6 @@ document
   .appendChild(pElement)
   .appendChild(abordablesElements);
 
-//Code Exercice
 const nomsDisponibles = pieces.map((piece) => piece.nom);
 const prixDisponibles = pieces.map((piece) => piece.prix);
 
@@ -173,3 +187,5 @@ const boutonMettreAJour = document.querySelector(".btn-maj");
 boutonMettreAJour.addEventListener("click", function () {
   window.localStorage.removeItem("pieces");
 });
+
+await afficherGraphiqueAvis();
